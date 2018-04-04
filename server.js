@@ -3,13 +3,11 @@
  * Date     : 03/04/2018
  * 
  * Desc     : NodeJs application  
- * Notes    : It will be more convenient do the calculator a module 
  */
 
 var express    = require('express')
 var bodyParser = require('body-parser')    // To handle post requisitons protocols
-var app        = express()  
-var octicons   = require("octicons")               
+var app        = express()            
 
 app.use(express.static(__dirname))         // To handle html file
 app.use(bodyParser.json())
@@ -18,9 +16,7 @@ app.use(bodyParser.urlencoded({extended: false}))
 
 app.post('/calculate', (req, res) => {
     req.body.result = calc(req.body.expr) // Calculate
-    console.log(req.body)
     res.json(req.body)
-    //res.writeHead(200, {'Content-Type': 'application/json'})
 })
 
 var server = app.listen(3000, () => {
@@ -112,7 +108,6 @@ function calc(expr) {
         if ( isNaN(token) ) {
             rOp = stack.pop();
             lOp = stack.pop();
-            console.log(lOp + token + rOp)
             stack.push(eval(lOp + token + rOp))
         }
         else {

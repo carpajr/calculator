@@ -3,7 +3,7 @@
  * Date     : 03/04/2018
  * 
  * Desc     : NodeJs application  
- * Notes    : It will be more convenient do the calculator a module 
+ * Notes    : It will be more convenient make the calculator as a module 
  */
 
 var express    = require('express')

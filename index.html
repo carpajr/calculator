@@ -1,0 +1,126 @@
+<!doctype html>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.2.1.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+<link href="https://getbootstrap.com/docs/4.0/examples/offcanvas/offcanvas.css" rel="stylesheet">
+
+<title>Calculadora</title>
+<body class="bg-light">
+    
+    <div class="container">
+        <br/>
+        <div class="d-flex align-items-center p-3 my-3 text-white-50 bg-purple rounded box-shadow">
+            <div class="lh-100">
+                <h6 class="mb-0 text-white lh-100">Calculadora</h6>
+                <small>Uma simples implementação que realiza a computação da expressão no backend</small>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="my-3 p-3 bg-white rounded box-shadow">
+                    <hr class="my-4">
+                    <div class="form-group input-group-lg">
+                        <input id="expression" disabled="disabled" type="text" class="form-control box-shadow" placeholder="_">
+                    </div>
+                    <hr class="my-4">
+                    <div class="row form-group">
+                        <div class="col"><button class="btn btn-outline-dark btn-secondary btn-block box-shadow">7</button></div>
+                        <div class="col"><button class="btn btn-outline-dark btn-secondary btn-block box-shadow">8</button></div>
+                        <div class="col"><button class="btn btn-outline-dark btn-secondary btn-block box-shadow">9</button></div>
+                        <div class="col"><button class="btn btn-warning btn-block box-shadow">+</button></div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col"><button class="btn btn-outline-dark btn-secondary btn-block box-shadow">4</button></div>
+                        <div class="col"><button class="btn btn-outline-dark btn-secondary btn-block box-shadow">5</button></div>
+                        <div class="col"><button class="btn btn-outline-dark btn-secondary btn-block box-shadow">6</button></div>
+                        <div class="col"><button class="btn btn-warning btn-block box-shadow">-</button></div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col"><button class="btn btn-outline-dark btn-secondary btn-block box-shadow">1</button></div>
+                        <div class="col"><button class="btn btn-outline-dark btn-secondary btn-block box-shadow">2</button></div>
+                        <div class="col"><button class="btn btn-outline-dark btn-secondary btn-block box-shadow">3</button></div>
+                        <div class="col"><button class="btn btn-warning btn-block box-shadow">*</button></div>
+                    </div>     
+                    <div class="row form-group">
+                        <div class="col"><button class="btn btn-outline-dark btn-secondary btn-block box-shadow">0</button></div>
+                        <div class="col"><button id="clear" class="btn btn-secondary btn-block box-shadow">C</button></div>
+                        <div class="col"><button id="calc" class="btn btn-success btn-block box-shadow">Calcular</button></div>
+                        <div class="col"><button class="btn btn-warning btn-block box-shadow">/</button></div>
+                    </div>    
+                    <input id="resetCalc" type="hidden" value="0">
+                </div>
+            </div>
+            
+            <div class="col">
+                <div id="history" class="my-3 p-3 bg-white rounded box-shadow">
+                    <h4>Aviso</h4>
+                    <p>O projeto desta calculadora apenas implementa as funções básicas de adição, subtração, divisão e multiplicação. 
+                        A inserção das operações pode ser realizada apenas por meio dos botões. </p>
+                    <h4>Últimas operações</h4>
+                    <ol></ol>
+                </div>
+            </div>
+        </div>
+       
+    </div>   
+        
+        <script>
+            
+            $(() => {
+                var expression, token, lastOperation = '', resetCalc 
+                
+                $( ":button" ).click(function() {
+                    token = $(this).html()
+                    resetCalc = $("#resetCalc").val()
+
+                    if (resetCalc === '1') {
+                        expression = ''
+                        $("#resetCalc").val('0')
+                    }
+                    else {
+                        expression = $("#expression").val()
+                    }
+
+                    if(!isNaN(token)) {
+                        lastOperation = ''
+                    }
+                    else if (token !==  $("#calc").html() && token !== $("#clear").html() ) { 
+                        if (lastOperation !== '')
+                        expression = expression.substring(0, expression.length - 1)
+                        
+                        lastOperation = token 
+                    }
+                    else {
+                        if (isNaN(lastOperation))
+                        expression = expression.substring(0, expression.length - 1)
+                        
+                        if (token === $("#clear").html())
+                        expression = ''
+                        else
+                        reqCalc({ expr: expression, result: ''})
+                        
+                        lastOperation = ''
+                        token = ''
+                    }
+                    
+                    $("#expression").val(expression + token)
+                }) 
+
+            })
+            
+            
+            function history(m){
+                $("#history ol").append(`<li><h6>Resultado: ${m.result}</h6><p>Expressão aritmética: ${m.expr}</p></li>`)
+            }
+            
+            function reqCalc(message) {
+                $.post('http://localhost:3000/calculate', message, (data) => {
+                    history(data)
+                    $("#expression").val(data.result)
+                    $("#resetCalc").val('1')
+                })
+            }
+        </script>
+    </body>
